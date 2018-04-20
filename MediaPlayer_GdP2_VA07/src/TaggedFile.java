@@ -5,58 +5,56 @@ import java.util.Map;
 import javax.naming.ldap.BasicControl;
 
 
-public class TaggedFile extends AudioFile {
-    Map<String,Object> tag_map;
+public class TaggedFile extends SampledFile {
+    private String album = "";
+
     public TaggedFile(){
         super();
     }
 
     public TaggedFile(String s){
         super(s);
+        readAndStoreTags(this.getPathname());
     }
 
-    public static String timeFormatter(long microtime){
-        if(microtime<0){
-            throw new RuntimeException("Negativ time value provided");
-        }else if(microtime>(long)6*Math.pow(10,9)){
-            throw new RuntimeException("Time value exceeds allowed format");
-        }else {
-            return String.format("%02d:%02d", (int) (microtime / Math.pow(10, 6) / 60), (int) (microtime / Math.pow(10, 6) % 60));
-        }
+    public String[] fields() {
+        String[] as ={this.getAuthor(),this.getTitle(),this.getAlbum(),this.getFormattedDuration()};
+        return as;
     }
 
     public void readAndStoreTags(String pathname){
-        this.tag_map = TagReader.readTags(pathname);
+
+        Map<String,Object> tag_map = TagReader.readTags(pathname);
 
         for(String key: tag_map.keySet()) {
-            if(key.equals("author")) {
-                this.setAuthor((String)this.tag_map.get(key));
+            if(key.equals("title") && !tag_map.get(key).equals("")) {
+                this.setTitle(((String)tag_map.get(key)).trim());
+            }
+            if(key.equals("author") && !tag_map.get(key).equals("")){
+                this.setAuthor(((String)tag_map.get(key)).trim());
+            }
+            if(key.equals("album")){
+                this.setAlbum(((String)tag_map.get(key)).trim());
+            }
+            if(key.equals("duration")){
+                this.setDuration((long)tag_map.get(key));
             }
         }
     }
 
-    @Override
-    public void play() {
-        BasicPlayer.play(getPathname());
+    public String toString(){
+        if(this.getAlbum().equals("")) {
+            return super.toString()+" - "+this.getFormattedDuration();
+        }else {
+            return super.toString()+" - "+this.getAlbum()+" - "+this.getFormattedDuration();
+        }
+
     }
 
-    @Override
-    public void togglePause() {
-        BasicPlayer.togglePause();
+    public String getAlbum() {
+        return this.album;
     }
-
-    @Override
-    public void stop() {
-        BasicPlayer.stop();
-    }
-
-    @Override
-    public String getFormattedDuration() {
-        return "";
-    }
-
-    @Override
-    public String getFormattedPosition() {
-        return "";
+    public void setAlbum(String album) {
+        this.album = album;
     }
 }

@@ -5,12 +5,11 @@ import java.io.File;
 
 public abstract class AudioFile {
 
-
-
 	private String filename = "";
 	private String pathname = "";
 	private String author = "";
 	private String title = "";
+	private long duration = 0L;
 
 	private boolean isWindows() {
 		return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
@@ -124,6 +123,7 @@ public abstract class AudioFile {
 	public abstract void stop();
 	public abstract String getFormattedDuration();
 	public abstract String getFormattedPosition();
+	public abstract String[] fields();
 
 	public String toString() {
 		String ret;
@@ -137,35 +137,37 @@ public abstract class AudioFile {
 		return ret;
 	}
 
+
 	public String getFilename() {
 		return this.filename;
 	}
-
 	public String getPathname() {
 		return this.pathname;
 	}
-
 	public String getAuthor() {
 		return this.author;
 	}
-
 	public String getTitle() {
 		return this.title;
 	}
 
+	public long getDuration() {
+		return this.duration;
+	}
     public void setFilename(String filename) {
         this.filename = filename;
     }
-
     public void setPathname(String pathname) {
         this.pathname = pathname;
     }
-
     public void setAuthor(String author) {
         this.author = author;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
+
+	public void setDuration(long duration) {
+		this.duration = duration;
+	}
 }
